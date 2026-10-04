@@ -1,0 +1,133 @@
+{
+  "search": {
+    "city": "ahvaz",
+    "city_id": "7",
+    "category": "car",
+    "category_id": "light",
+    "pages": 2,
+    "sort": "sort_date",
+    "query": "",
+    "fetch_all_cars": false
+  },
+  "watch": {
+    "interval_minutes": 10,
+    "max_pages_per_run": 2,
+    "delay_min_seconds": 5.0,
+    "delay_max_seconds": 12.0,
+    "max_runs": 0,
+    "max_specs_per_run": 12
+  },
+  "targets": [
+    {
+      "id": "pride-131",
+      "label": "پراید ۱۳۱",
+      "paths": ["pride/131"],
+      "enabled": true
+    },
+    {
+      "id": "peugeot-206",
+      "label": "پژو ۲۰۶",
+      "paths": ["peugeot/206"],
+      "enabled": false
+    },
+    {
+      "id": "peugeot",
+      "label": "پژو (همه مدل‌ها)",
+      "brand_paths": ["peugeot"],
+      "enabled": false
+    },
+    {
+      "id": "free-search",
+      "label": "جست‌وجوی آزاد",
+      "query": "پراید ۱۳۱",
+      "enabled": false
+    },
+    {
+      "id": "all-cars",
+      "label": "همهٔ خودروهای اهواز",
+      "enabled": false
+    }
+  ],
+  "filters": {
+    "min_year": null,
+    "max_year": null,
+    "max_mileage_km": null,
+    "min_price_toman": 50000000,
+    "max_price_toman": null,
+    "exclude_business": true,
+    "exclude_suspicious": true
+  },
+  "deals": {
+    "min_profit_toman": 30000000,
+    "min_roi": 0.06,
+    "max_age_hours": 24,
+    "require_clean_body": true,
+    "require_sound_chassis": true,
+    "require_known_condition": true,
+    "exclude_business": true,
+    "max_mileage_km": null,
+    "min_year": null,
+    "max_year": null,
+    "max_price_toman": null,
+    "exclude_salvage": true
+  },
+  "rules": [
+    {
+      "id": "under-market",
+      "name": "زیر قیمت بازار",
+      "enabled": true,
+      "max_mileage_km": 250000,
+      "exclude_business": true,
+      "exclude_suspicious": true,
+      "max_discount_vs_market": 0.08,
+      "require_price": true,
+      "notify": true
+    },
+    {
+      "id": "clean-lowkm",
+      "name": "سالم و کم‌کارکرد",
+      "enabled": true,
+      "min_year": 1388,
+      "max_mileage_km": 120000,
+      "exclude_business": true,
+      "exclude_suspicious": true,
+      "max_discount_vs_market": 0.12,
+      "require_price": true,
+      "notify": true
+    },
+    {
+      "id": "budget",
+      "name": "ارزان‌تر از سقف",
+      "enabled": true,
+      "max_mileage_km": 300000,
+      "max_price_toman": 300000000,
+      "exclude_business": true,
+      "exclude_suspicious": true,
+      "require_price": true,
+      "notify": true
+    }
+  ],
+  "scoring": {
+    "weights": {
+      "price": 0.4,
+      "year": 0.25,
+      "mileage": 0.2,
+      "model": 0.15
+    },
+    "market_max_age_hours": 96,
+    "reference_year": 1404,
+    "reference_mileage_km": 60000
+  },
+  "notify": {
+    "console": true,
+    "desktop": true,
+    "sound": false,
+    "color": true
+  },
+  "storage": {
+    "db_path": "data/pride.db",
+    "filters_path": "data/divar-filters.json",
+    "catalog_path": "data/catalog-light.json",
+    "keep_days": 180
+  }
+}

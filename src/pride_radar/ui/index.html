@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#faf9f7">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231c6b4f'/><text x='16' y='23' font-size='19' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>ر</text></svg>">
+<title>رادار — بازار خودرو</title>
+<style>
+/* ============================================================
+   Minimal design system
+   ============================================================ */
+:root{
+  --bg:#faf9f7;
+  --surface:#ffffff;
+  --surface-2:#f4f2ef;
+  --surface-3:#ebe8e3;
+  --line:#e4e0da;
+  --line-strong:#d4cfc7;
+  --ink:#1a1917;
+  --ink-2:#5c574f;
+  --ink-3:#918b81;
+  --accent:#1c6b4f;
+  --accent-soft:#e6f0ec;
+  --good:#1c6b4f;
+  --good-bg:#e6f0ec;
+  --warn:#9a6b1f;
+  --warn-bg:#f7efe0;
+  --bad:#a33a2f;
+  --bad-bg:#f8e9e7;
+  --info:#3a5f8a;
+  --info-bg:#e9eef5;
+  --r:12px;
+  --r-sm:8px;
+  --sh:0 1px 2px rgba(26,25,23,.05), 0 4px 16px rgba(26,25,23,.04);
+  --sh-lg:0 8px 40px rgba(26,25,23,.12);
+  --sp:16px;
+  --sidebar-w:296px;
+  --safe-b:env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#131211; --surface:#1b1a18; --surface-2:#232120; --surface-3:#2c2a28;
+    --line:#302d2b; --line-strong:#413d3a;
+    --ink:#f0ede9; --ink-2:#a8a29a; --ink-3:#736e67;
+    --accent:#5fbf97; --accent-soft:#1b2f28;
+    --good:#5fbf97; --good-bg:#1b2f28;
+    --warn:#d9a441; --warn-bg:#2f2718;
+    --bad:#e08a7d; --bad-bg:#31201d;
+    --info:#8fb0d8; --info-bg:#1e2833;
+    --sh:0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+    --sh-lg:0 8px 40px rgba(0,0,0,.5);
+  }
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Vazirmatn","IRANSans","Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;
+  font-size:14px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:6px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3);background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============================ layout ============================ */
+/* One screen does one job: show cars worth buying. Filters live in a drawer so
+   the list gets the whole window and nothing competes with the profit number. */
+.shell{display:flex;min-height:100vh;min-height:100dvh}
+.side{
+  position:fixed;inset:0 0 0 auto;width:min(88vw,330px);z-index:90;
+  transform:translateX(100%);transition:transform .26s cubic-bezier(.3,.9,.3,1);
+  background:var(--surface);border-left:1px solid var(--line);
+  overflow-y:auto;padding:20px 18px calc(20px + var(--safe-b));
+  display:flex;flex-direction:column;gap:20px;
+  box-shadow:var(--sh-lg);padding-top:calc(20px + env(safe-area-inset-top,0px));
+}
+.side.open{transform:none}
+/* On desktop the drawer covers the header, including the menu button, so it needs
+   its own close control. Escape and the scrim stay as shortcuts. */
+.side-h{display:flex;align-items:center;gap:10px}
+.side-h .brand{flex:1;min-width:0}
+.side-x{
+  flex:0 0 auto;width:32px;height:32px;border-radius:9px;
+  display:grid;place-items:center;font-size:22px;line-height:1;
+  color:var(--ink-2);background:var(--surface-2);transition:.14s;
+}
+.side-x:hover{background:var(--bad-bg);color:var(--bad)}
+.scrim{
+  position:fixed;inset:0;background:rgba(20,19,18,.4);z-index:80;
+  opacity:0;pointer-events:none;transition:opacity .24s;
+}
+.scrim.on{opacity:1;pointer-events:auto}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* ============================ brand ============================ */
+.brand{display:flex;align-items:center;gap:9px}
+.brand .mark{
+  width:26px;height:26px;border-radius:7px;background:var(--accent);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;flex:0 0 auto;
+}
+.brand b{font-size:15px;font-weight:650;letter-spacing:-.2px;display:block;line-height:1.3}
+.brand small{color:var(--ink-3);font-size:11.5px}
+
+/* ============================ controls ============================ */
+.fld{display:flex;flex-direction:column;gap:7px}
+.fld > label{font-size:11.5px;font-weight:600;color:var(--ink-2);letter-spacing:.1px}
+.hint{font-size:11px;color:var(--ink-3);line-height:1.65}
+.inp{
+  width:100%;background:var(--surface-2);border:1px solid transparent;
+  border-radius:var(--r-sm);padding:9px 11px;outline:none;transition:.16s;
+}
+.inp:focus{background:var(--surface);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.inp::placeholder{color:var(--ink-3)}
+select.inp{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23918b81' d='M0 0h10L5 6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:left 11px center;padding-left:30px}
+.row{display:flex;gap:8px}.row > *{flex:1;min-width:0}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 15px;border-radius:var(--r-sm);font-weight:600;font-size:13px;
+  background:var(--surface-2);transition:.16s;white-space:nowrap;
+}
+.btn:hover{background:var(--surface-3)}
+.btn:active{transform:translateY(.5px)}
+.btn.pri{background:var(--accent);color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.pri:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.sm{padding:6px 11px;font-size:12px;border-radius:7px}
+.btn.gh{background:transparent;border:1px solid var(--line)}
+.btn.gh:hover{background:var(--surface-2)}
+.btn.blk{width:100%}
+
+.chk{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;user-select:none;padding:2px 0}
+.chk input{
+  appearance:none;width:17px;height:17px;border:1.5px solid var(--line-strong);
+  border-radius:5px;flex:0 0 auto;transition:.15s;position:relative;cursor:pointer;
+}
+.chk input:checked{background:var(--accent);border-color:var(--accent)}
+.chk input:checked::after{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='9' viewBox='0 0 11 9'%3E%3Cpath fill='none' stroke='white' stroke-width='2' d='M1 4.5l3 3 6-6'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;max-height:168px;overflow-y:auto;padding:1px}
+.chip{
+  padding:5px 10px;border-radius:20px;background:var(--surface-2);
+  font-size:12px;transition:.14s;border:1px solid transparent;user-select:none;
+  white-space:nowrap;
+}
+.chip:hover{background:var(--surface-3)}
+.chip.on{background:var(--accent);color:#fff;font-weight:600}
+.chip.on.brand{background:var(--ink);color:var(--bg)}
+
+/* segmented control */
+.seg{display:flex;background:var(--surface-2);border-radius:9px;padding:3px;gap:2px}
+.seg button{
+  flex:1;padding:7px 10px;border-radius:7px;font-size:12.5px;font-weight:600;
+  color:var(--ink-2);transition:.15s;white-space:nowrap;
+}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--sh)}
+.seg .count{
+  display:inline-block;margin-right:5px;padding:1px 6px;border-radius:9px;
+  background:var(--accent-soft);color:var(--accent);font-size:10.5px;font-weight:700;
+}
+.seg button.on .count{background:var(--accent);color:#fff}
+
+.sep{height:1px;background:var(--line);margin:2px 0}
+
+/* ============================ header ============================ */
+.head{
+  width:100%;max-width:1040px;margin:0 auto;
+  position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--line);padding:12px 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.head h1{font-size:15px;font-weight:650;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.head .sub{font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+.head .grow{flex:1}
+.seg.top{
+  flex:0 0 auto;background:var(--surface-2);padding:3px;border-radius:10px;
+}
+.seg.top button{padding:5px 12px;font-size:12.5px;font-weight:600}
+.seg.top .count{
+  background:var(--accent);color:#fff;border-radius:20px;padding:0 5px;
+  font-size:10px;min-width:16px;display:inline-block;line-height:15px;
+}
+/* always visible: without it the filter drawer is unreachable */
+.burger{display:flex;width:38px;height:38px;border-radius:var(--r-sm);background:var(--surface-2);
+  align-items:center;justify-content:center;flex:0 0 auto}
+.burger svg{width:19px;height:19px;stroke:var(--ink)}
+
+.kpis{display:flex;gap:20px;align-items:center}
+.kpi{display:flex;flex-direction:column;line-height:1.35}
+.kpi b{font-size:14px;font-weight:650;font-variant-numeric:tabular-nums}
+.kpi span{font-size:10.5px;color:var(--ink-3)}
+
+/* market strip */
+.strip{
+  display:flex;gap:8px;padding:12px 20px;overflow-x:auto;
+  border-bottom:1px solid var(--line);scrollbar-width:none;
+  width:100%;max-width:1000px;margin:0 auto;
+}
+.strip::-webkit-scrollbar{display:none}
+.mchip{
+  flex:0 0 auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:8px 13px;min-width:126px;transition:.14s;
+}
+.mchip:hover{border-color:var(--line-strong)}
+.mchip.on{border-color:var(--accent);background:var(--accent-soft)}
+.mchip b{display:block;font-size:13.5px;font-weight:650;font-variant-numeric:tabular-nums}
+.mchip span{font-size:10.5px;color:var(--ink-3)}
+
+/* ============================ progress ============================ */
+.prog{
+  margin:12px 20px 0;padding:12px 14px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r);display:none;box-shadow:var(--sh);
+}
+.prog.on{display:block}
+.prog .t{font-size:12.5px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.spin{width:13px;height:13px;border:2px solid var(--line-strong);border-top-color:var(--accent);
+  border-radius:50%;animation:sp .7s linear infinite;flex:0 0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.prog .log{max-height:132px;overflow-y:auto;font-size:11.5px;color:var(--ink-2);line-height:1.9}
+.prog .log div{white-space:pre-wrap;word-break:break-word;padding:1px 0}
+.prog.err{border-color:var(--bad);background:var(--bad-bg)}
+
+/* ============================ list ============================ */
+.list{
+  flex:1;padding:16px 20px calc(28px + var(--safe-b));
+  display:flex;flex-direction:column;gap:10px;
+  width:100%;max-width:1000px;margin:0 auto;
+}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;box-shadow:var(--sh);transition:.15s;position:relative;
+  display:grid;gap:9px;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:"star head" "star body" "star foot";
+  align-items:start;
+}
+.card:hover{border-color:var(--line-strong)}
+.card.marked{border-color:var(--accent);background:linear-gradient(var(--accent-soft),var(--surface) 46%)}
+.card.gone{opacity:.5}
+.c-star{grid-area:star}
+.c-head{grid-area:head;display:grid;gap:12px;align-items:center;
+  grid-template-columns:minmax(0,1fr) 74px 92px 82px}
+.c-body{grid-area:body;display:grid;gap:10px;align-items:center;
+  grid-template-columns:minmax(0,1fr) 286px}
+.c-nums{display:grid;grid-template-columns:128px 146px;gap:10px}
+.c-foot{grid-area:foot;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.c-title{font-weight:600;font-size:14.5px;line-height:1.5;display:block;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-title:hover{color:var(--accent)}
+
+/* metric cell: value over caption, identical width in every card */
+.m{display:flex;flex-direction:column;gap:1px;min-width:0}
+.m b{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m i{font-style:normal;font-size:10px;color:var(--ink-3)}
+.m.fresh b{color:var(--good)}
+
+/* price and profit: fixed-width labelled blocks so they line up down the page */
+.cell{display:flex;flex-direction:column;gap:1px;min-width:0;
+  padding:6px 10px;border-radius:var(--r-sm);background:var(--surface-2)}
+.cell i{font-style:normal;font-size:10px;color:var(--ink-3)}
+.cell b{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.profit{background:var(--good-bg);color:var(--good)}
+.cell.profit i{color:var(--good);opacity:.75}
+.cell.profit b{font-size:17px}
+.card.watch .cell.profit{background:var(--warn-bg);color:var(--warn)}
+.card.watch .cell.profit i{color:var(--warn);opacity:.75}
+.cell.zero{background:transparent}
+.cell.zero b{font-weight:600;color:var(--ink-3)}
+
+/* conditions keep one fixed row; problems get their own tint */
+.conds{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:22px}
+.conds .tag{font-size:10.5px;padding:2px 7px}
+.why{font-size:11.5px;line-height:1.55;color:var(--ink-3);margin-top:4px}
+.why em{font-style:normal;color:var(--warn);font-weight:600}
+.place{font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p.good{color:var(--good)} .p.warn{color:var(--warn)} .p.bad{color:var(--bad)}
+.profit{font-size:11px;font-weight:700;color:var(--good);white-space:nowrap}
+.profit.neg{color:var(--ink-3);font-weight:500}
+
+/* ---- deal card ---- */
+.card.buy{border-color:var(--good);box-shadow:0 0 0 1px var(--good) inset}
+.card.watch{border-right:3px solid var(--warn)}
+.bar{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:13px 16px;margin:14px auto 0;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface);
+  width:calc(100% - 40px);max-width:1000px;
+}
+.bar .t{font-size:12px;font-weight:650;color:var(--ink-2)}
+.bar .t b{color:var(--ink);font-size:15px}
+.bar .c{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-3)}
+.bar .c input{margin:0}
+.bar .warnpill{color:var(--warn);font-weight:600}
+label.mini{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+label.mini > span{font-size:10.5px;color:var(--ink-3)}
+
+.star{
+  width:30px;height:30px;border-radius:8px;flex:0 0 auto;
+  display:grid;place-items:center;transition:.15s;color:var(--ink-3);
+}
+.star:hover{background:var(--surface-2);color:var(--ink-2)}
+.star svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+.star.on{color:var(--warn)}
+.star.on svg{fill:var(--warn);stroke:var(--warn)}
+.star.on:hover{background:var(--warn-bg)}
+
+.xbtn{
+  width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  color:var(--ink-3);transition:.15s;flex:0 0 auto;
+}
+.xbtn:hover{background:var(--bad-bg);color:var(--bad)}
+.xbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;
+  font-size:11.5px;font-weight:600;background:var(--surface-2);color:var(--ink-2);
+  font-variant-numeric:tabular-nums;
+}
+.tag.v{background:var(--good-bg);color:var(--good)}
+.tag.w{background:var(--warn-bg);color:var(--warn)}
+.tag.b{background:var(--bad-bg);color:var(--bad)}
+.tag.i{background:var(--info-bg);color:var(--info)}
+.tag.ghost{background:transparent;border:1px solid var(--line)}
+.tag.lp{background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--good-bg);color:var(--good)}
+.tag.no{background:var(--bad-bg);color:var(--bad)}
+.tag.fresh{background:var(--accent);color:#fff}
+.tag.dim{opacity:.6}
+.tag b{font-weight:700}
+
+.card-foot{display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.offer{font-size:11.5px;color:var(--ink-2)}
+.offer b{color:var(--ink);font-weight:650;font-variant-numeric:tabular-nums}
+.card-foot .grow{flex:1}
+
+.empty{text-align:center;padding:72px 20px;color:var(--ink-3)}
+.empty svg{width:44px;height:44px;stroke:var(--line-strong);margin-bottom:14px}
+.empty h3{font-size:15px;color:var(--ink-2);margin-bottom:5px;font-weight:600}
+.empty p{font-size:12.5px}
+
+/* ============================ modal ============================ */
+.mask{
+  position:fixed;inset:0;background:rgba(20,19,18,.45);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;padding:20px;z-index:100;
+}
+.mask.on{display:flex}
+.sheet{
+  background:var(--surface);border-radius:16px;width:100%;max-width:520px;
+  box-shadow:var(--sh-lg);max-height:88vh;overflow-y:auto;
+  animation:rise .22s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.sheet-h{padding:18px 20px 12px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:12px}
+.sheet-h h3{flex:1;font-size:15px;font-weight:650;line-height:1.5}
+.x{width:30px;height:30px;border-radius:7px;background:var(--surface-2);display:grid;place-items:center;flex:0 0 auto;font-size:17px;color:var(--ink-2)}
+.x:hover{background:var(--surface-3)}
+.sheet-b{padding:14px 20px}
+.dgroup{margin-bottom:16px}
+.dgroup h4{
+  font-size:11px;font-weight:650;color:var(--ink-3);letter-spacing:.02em;
+  margin:0 0 2px;padding-bottom:5px;border-bottom:1px solid var(--line);
+}
+.drow{display:flex;justify-content:space-between;gap:14px;padding:7px 0;font-size:13px}
+.drow span{color:var(--ink-2);font-size:12px;flex:0 0 auto}
+.drow b{font-weight:600;text-align:left;font-variant-numeric:tabular-nums}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv:last-child{border:none}
+.kv span{color:var(--ink-2);font-size:12px;flex:0 0 auto}
+.kv b{font-weight:600;text-align:left;font-variant-numeric:tabular-nums}
+.sheet-f{padding:14px 20px calc(18px + var(--safe-b));display:flex;gap:8px}
+.sheet-f .btn{flex:1}
+
+.scrim{display:none}
+
+/* ============================ mobile ============================ */
+@media (max-width: 900px){
+  .head{padding:10px 14px;gap:10px}
+  .head h1{font-size:14px}
+  .head .grow:first-of-type{display:none}
+  .seg.top button{padding:5px 9px;font-size:12px}
+  .kpis{gap:14px}
+  .kpi b{font-size:13px}
+  .kpi.opt{display:none}
+  .strip{padding:10px 14px}
+  .list{padding:12px 14px calc(20px + var(--safe-b))}
+  .bar{width:calc(100% - 24px);margin:10px 12px 0;padding:11px 13px;gap:12px}
+  .prog{margin:10px 14px 0}
+  .card{padding:12px 13px;gap:8px}
+  /* stack the slots, but keep every caption so nothing loses its meaning */
+  .c-head{grid-template-columns:minmax(0,1fr) repeat(3,auto);gap:10px;justify-content:start}
+  .c-body{grid-template-columns:minmax(0,1fr) 132px;gap:8px;align-items:start}
+  .c-nums{grid-template-columns:minmax(0,1fr);gap:6px}
+  .c-title{white-space:normal}
+  .c-foot{gap:8px}
+  .sheet{max-width:none;border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;right:0;
+    max-height:90dvh;animation:up .26s cubic-bezier(.2,.8,.3,1)}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .mask{padding:0;align-items:flex-end}
+}
+@media (max-width: 420px){
+  .head .sub{display:none}
+  .btn.pri .t{display:none}
+}
+@media (hover:none){
+  .card:hover{border-color:var(--line)}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="shell">
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="side" id="side">
+    <div class="side-h">
+      <div class="brand">
+        <div class="mark">ر</div>
+        <div style="min-width:0">
+          <b>رادار خودرو</b>
+          <small id="brandSub">در حال بارگذاری…</small>
+        </div>
+      </div>
+      <button class="side-x" id="sideClose" aria-label="بستن فیلترها">×</button>
+    </div>
+
+
+    <div class="fld">
+      <label for="q">جست‌وجو</label>
+      <input class="inp" type="search" id="q" placeholder="عنوان، محله یا نام خودرو">
+    </div>
+
+
+    <div class="fld">
+      <label>معیارهای خرید</label>
+      <label class="chk"><input type="checkbox" id="dClean" checked> فقط بی‌خط و خش</label>
+      <label class="chk"><input type="checkbox" id="dChassis" checked> فقط شاسی سالم</label>
+      <label class="chk"><input type="checkbox" id="dKnown" checked> فقط مشخصات خوانده‌شده</label>
+      <label class="chk"><input type="checkbox" id="dBusiness" checked> حذف مغازه‌ای</label>
+      <label class="chk"><input type="checkbox" id="dSalvage" checked> حذف تصادفی و اوت‌گاز</label>
+      <div class="hint">پیش‌فرض‌ها از <code>config.json</code> می‌آیند</div>
+    </div>
+
+    <div class="fld">
+      <label>حداقل سود و تازگی</label>
+      <div class="row">
+        <label class="mini"><span>سود (ت)</span>
+          <input class="inp" type="number" id="dProfit" step="10000000"></label>
+        <label class="mini"><span>ساعت</span>
+          <input class="inp" type="number" id="dAge" min="1" step="6"></label>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="fld">
+      <label>سال ساخت</label>
+      <div class="row">
+        <input class="inp" type="number" id="minYear" placeholder="از" min="1360" max="1412">
+        <input class="inp" type="number" id="maxYear" placeholder="تا" min="1360" max="1412">
+      </div>
+    </div>
+
+    <div class="fld">
+      <label for="maxKm">حداکثر کارکرد (کیلومتر)</label>
+      <input class="inp" type="number" id="maxKm" placeholder="بدون محدودیت" step="1000">
+    </div>
+
+    <div class="fld">
+      <label for="maxPrice">حداکثر قیمت (تومان)</label>
+      <input class="inp" type="number" id="maxPrice" placeholder="بدون محدودیت" step="10000000">
+    </div>
+
+    <div class="fld">
+      <label class="chk"><input type="checkbox" id="hideDismissed" checked> پنهان کردن دیده‌شده‌ها</label>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="fld">
+      <label>نمایش</label>
+      <div class="hint">از نوار بالای صفحه هم می‌شود عوض کرد</div>
+    </div>
+
+    <div class="fld">
+      <label for="sort">ترتیب نمایش (نمای همهٔ آگهی‌ها)</label>
+      <select class="inp" id="sort">
+        <option value="margin">بیشترین سود</option>
+        <option value="published">جدیدترین انتشار</option>
+        <option value="discount">بیشترین تخفیف</option>
+        <option value="price_asc">ارزان‌ترین</option>
+        <option value="price_desc">گران‌ترین</option>
+        <option value="year_desc">جدیدترین مدل</option>
+        <option value="flip">امتیاز شکار</option>
+      </select>
+    </div>
+
+    <button class="btn gh blk sm" id="resetBtn">بازنشانی فیلترها</button>
+
+    <div style="flex:1"></div>
+    <div class="hint" id="webLink"></div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <main class="main">
+    <header class="head">
+      <button class="burger" id="burger" aria-label="فیلترها">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+          <path d="M3 6h18M6 12h12M10 18h4"/>
+        </svg>
+      </button>
+      <div style="min-width:0">
+        <h1 id="headTitle">رادار خودرو</h1>
+        <div class="sub" id="headSub">—</div>
+      </div>
+      <div class="grow"></div>
+      <div class="seg top" id="viewSeg">
+        <button data-view="deals" class="on">فرصت‌ها <span class="count" id="dealCount">۰</span></button>
+        <button data-view="bookmarks">بوکمارک <span class="count" id="bmCount">۰</span></button>
+        <button data-view="all">همه</button>
+      </div>
+      <div class="grow"></div>
+      <div class="kpis">
+        <div class="kpi"><b id="kTotal">—</b><span>آگهی</span></div>
+        <div class="kpi opt"><b id="kMedian">—</b><span>میانه</span></div>
+      </div>
+      <button class="btn pri" id="fetchBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>        </svg>
+        <span class="t">دریافت</span>
+      </button>
+    </header>
+
+    <div class="strip" id="strip"></div>
+
+    <div class="prog" id="prog">
+      <div class="t"><span class="spin"></span><span id="progTitle">در حال دریافت…</span></div>
+      <div class="log" id="progLog"></div>
+    </div>
+
+    <div class="bar" id="bar"></div>
+
+    <div class="list" id="list">
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12h4l2-6 4 12 2-6h6"/>
+        </svg>
+        <h3>در حال بارگذاری…</h3>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="mask" id="mask">
+  <div class="sheet">
+    <div class="sheet-h">
+      <h3 id="mTitle">جزئیات</h3>
+      <button class="x" id="mClose" aria-label="بستن">×</button>
+    </div>
+    <div class="sheet-b" id="mBody"></div>
+    <div class="sheet-f">
+      <a class="btn pri" id="mLink" href="#" target="_blank" rel="noopener">باز کردن آگهی</a>
+      <button class="btn gh" id="mClose2">بستن</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const S = {
+  market:null, items:[], path:"",
+  fetching:false, view:"deals", stats:null, criteria:null, summary:null, hint:null
+};
+const $ = id => document.getElementById(id);
+const FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+const fa = s => String(s ?? "").replace(/\d/g, d => FA[+d]);
+const grp = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const n0 = n => n == null ? "—" : fa(grp(n));
+const mT = n => n == null ? "—" : n >= 1e9 ? fa((n/1e9).toFixed(1)) + " میلیارد"
+                                  : n >= 1e6 ? fa(Math.round(n/1e6)) + " میلیون" : fa(grp(n));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const vClass = l => !l || l === "نامشخص" ? ""
+  : l === "مشکوک به قیمت غیرواقعی" ? "b"
+  : l.includes("زیر بازار") ? "v"
+  : l === "منصفانه" ? "i"
+  : l.includes("بالا") ? "w" : "";
+
+const pClass = it => it.delta_ratio == null ? "" : it.delta_ratio <= -0.07 ? "good" : it.delta_ratio <= 0.07 ? "" : "warn";
+
+/* ---------- age helpers ---------- */
+function ageInfo(iso){
+  if(!iso) return {text:"زمان نامشخص", fresh:false, hours:1e9};
+  const hours = (Date.now() - new Date(iso).getTime())/36e5;
+  if(hours < 1) return {text:"همین الان", fresh:true, hours};
+  if(hours < 24) return {text:`${fa(Math.round(hours))} ساعت پیش`, fresh:hours<=12, hours};
+  const days = Math.round(hours/24);
+  if(days < 30) return {text:`${fa(days)} روز پیش`, fresh:days<=2, hours};
+  const months = Math.round(days/30);
+  if(months < 12) return {text:`${fa(months)} ماه پیش`, fresh:false, hours};
+  return {text:`${fa(Math.round(months/12))} سال پیش`, fresh:false, hours};
+}
+
+/* ---------------- query ---------------- */
+function dealParams(){
+  const p = new URLSearchParams();
+  if ($("dProfit").value) p.set("min_profit", $("dProfit").value);
+  if ($("dAge").value) p.set("max_age", $("dAge").value);
+  p.set("clean_body", $("dClean").checked ? "1" : "0");
+  p.set("sound_chassis", $("dChassis").checked ? "1" : "0");
+  p.set("known_condition", $("dKnown").checked ? "1" : "0");
+  p.set("exclude_business", $("dBusiness").checked ? "1" : "0");
+  p.set("no_salvage", $("dSalvage").checked ? "1" : "0");
+  p.set("bookmarked", S.view === "bookmarks" ? "1" : "0");
+  p.set("hide_dismissed", $("hideDismissed").checked ? "1" : "0");
+  if ($("maxKm").value) p.set("max_mileage", $("maxKm").value);
+  if ($("minYear").value) p.set("min_year", $("minYear").value);
+  if ($("maxYear").value) p.set("max_year", $("maxYear").value);
+  if ($("maxPrice").value) p.set("max_price", $("maxPrice").value);
+  if (S.path) p.set("paths", S.path);
+  if ($("q").value.trim()) p.set("q", $("q").value.trim());
+  return p;
+}
+
+/* ---------------- query (نمای «همهٔ آگهی‌ها») ---------------- */
+function params(){
+  const p = new URLSearchParams();
+  if ($("q").value.trim()) p.set("q", $("q").value.trim());
+  if (S.path) p.set("paths", S.path);
+  if ($("minYear").value) p.set("min_year", $("minYear").value);
+  if ($("maxYear").value) p.set("max_year", $("maxYear").value);
+  if ($("maxKm").value) p.set("max_mileage", $("maxKm").value);
+  if ($("maxPrice").value) p.set("max_price", $("maxPrice").value);
+  if ($("dBusiness").checked) p.set("exclude_business", "1");
+  p.set("hide_dismissed", $("hideDismissed").checked ? "1" : "0");
+  p.set("bookmarked", S.view === "bookmarks" ? "1" : "0");
+  p.set("sort", $("sort").value);
+  return p.toString();
+}
+
+/* ---------------- data ---------------- */
+async function load(){
+  try{
+    if (S.view === "deals"){
+      const r = await fetch("/api/deals?" + dealParams());
+      const d = await r.json();
+      S.items = d.items || [];
+      S.criteria = d.criteria || S.criteria;
+      S.summary = d.summary || null;
+      S.hint = d.hint || null;
+      applyCriteria();
+      renderBar(d);
+      render(S.items);
+      return;
+    }
+    const r = await fetch("/api/listings?" + params());
+    const d = await r.json();
+    S.items = d.items || [];
+    $("bar").innerHTML = "";
+    render(S.items);
+  }catch(e){
+    $("list").innerHTML = '<div class="empty"><h3>خطا در دریافت اطلاعات</h3><p>' + esc(e) + "</p></div>";
+  }
+}
+
+/* pull criteria defaults into the inputs once, without stomping user edits */
+function applyCriteria(){
+  const c = S.criteria; if (!c) return;
+  const setOnce = (id, v) => { const el = $(id); if (el && el.dataset.touched !== "1") el.value = v ?? ""; };
+  const chk = (id, v) => { const el = $(id); if (el && el.dataset.touched !== "1") el.checked = !!v; };
+  setOnce("dProfit", c.min_profit_toman);
+  setOnce("dAge", c.max_age_hours);
+  chk("dClean", c.require_clean_body);
+  chk("dChassis", c.require_sound_chassis);
+  chk("dKnown", c.require_known_condition);
+  chk("dBusiness", c.exclude_business);
+  chk("dSalvage", c.exclude_salvage);
+}
+
+/* the one-glance summary: how many chances, and the best one */
+function renderBar(d){
+  const s = d.summary || {};
+  const c = d.criteria || {};
+  const sample = c.market_sample || 0;
+  let warn = "";
+  if (sample < 30){
+    warn = `<span class="warnpill">میانهٔ بازار روی ${fa(sample)} آگهی — کم‌تر از ۳۰ تا قابل اتکا نیست</span>`;
+  } else if (c.pending_specs > 0){
+    warn = `<span>${fa(c.pending_specs)} آگهی هنوز مشخصاتش خوانده نشده (فرمان specs)</span>`;
+  }
+  $("bar").innerHTML =
+    `<div class="t"><b>${fa(s.buy ?? 0)}</b> فرصت خرید</div>` +
+    (s.watch ? `<div class="t"><b>${fa(s.watch)}</b> ارزش تماشا</div>` : "") +
+    `<div class="t">بیشترین سود <b>${mT(s.best_profit ?? 0)}</b></div>` +
+    `<div class="t"><b>${fa(s.considered ?? 0)}</b> آگهی بررسی شد</div>` +
+    `<div class="c">${warn}</div>`;
+}
+
+const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4 6.2 20.5l1.1-6.5L2.6 9.4l6.5-.9z"/></svg>';
+const XMARK = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+const money = n => n == null ? "—" : Math.abs(n) >= 1e9
+  ? fa((n/1e9).toFixed(2).replace(/\.?0+$/,"")) + " میلیارد"
+  : Math.abs(n) >= 1e6 ? fa(Math.round(n/1e6)) + " میلیون" : fa(grp(n));
+/* 120,000 km reads faster as "۱۲۰ هزار" on a card */
+const km = n => n >= 1000 ? fa(Math.round(n/1000)) + " هزار کیلومتر" : fa(grp(n)) + " کیلومتر";
+
+/* One card design for every view, so the eye learns the slots once.
+   [title | year | km | age]  then  [conditions | price | profit]  then  place + actions */
+function cardHtml(it, withProfit){
+  const d = it.deal || {};
+  const age = ageInfo(it.published_at);
+  const cls = d.verdict === "BUY" ? "buy" : d.verdict === "WATCH" ? "watch" : "";
+
+  const metric = (v, cap, fresh) =>
+    v == null || v === "" ? `<div class="m"><b>—</b><i>${esc(cap)}</i></div>`
+                          : `<div class="m${fresh ? " fresh" : ""}"><b>${esc(v)}</b><i>${esc(cap)}</i></div>`;
+
+  // slot 2: the three fixed-width metric columns
+  const head =
+    `<div class="c-head">` +
+      `<a class="c-title" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title || "—")}</a>` +
+      metric(it.year ? fa(it.year) : null, "سال") +
+      metric(it.mileage ? km(it.mileage) : null, "کارکرد") +
+      metric(age.hours < 1e8 ? age.text : null, "زمان", age.fresh) +
+    `</div>`;
+
+  // conditions: confirmations, then anything still unresolved
+  const ok = (d.good || []).filter(t => !/بدون رنگ/.test(t)).slice(0, 2);
+  const paint = (d.good || []).some(t => /بدون رنگ/.test(t)) ? ["بدنه بدون رنگ"] : [];
+  const ask = (d.reasons || []).filter(r => /بپرس|نامشخص/.test(r)).slice(0, 2);
+  const conds = [...paint, ...ok, ...ask];
+  const condHtml = conds.length
+    ? `<div class="conds">${conds.map(t =>
+        `<span class="tag ${/بپرس|نامشخص/.test(t) ? "w" : "ok"}">${esc(fa(t))}</span>`).join("")}</div>`
+    : `<div class="conds"><span class="tag ghost">مشخصات نخوانده</span></div>`;
+
+  // price / profit: two fixed-width labelled blocks
+  const profit = !withProfit
+    ? `<div class="cell zero"><i>سود</i><b>—</b></div>`
+    : d.profit == null
+      ? `<div class="cell zero"><i>سود</i><b>—</b></div>`
+      : `<div class="cell profit"><i>سود${d.roi ? ` · ${fa(Math.round(d.roi*100))}٪` : ""}</i><b>${money(d.profit)}</b></div>`;
+
+  const body =
+    `<div class="c-body">` +
+      condHtml +
+      `<div class="c-nums">` +
+        `<div class="cell price"><i>قیمت آگهی</i><b>${money(it.price)}</b></div>` +
+        profit +
+      `</div>` +
+    `</div>`;
+
+  const showOffer = it.offer && it.offer < it.price;
+  const foot =
+    `<div class="c-foot">` +
+      `<div class="place">${esc([it.district, it.city, it.trim].filter(Boolean).join(" · "))}` +
+        (showOffer ? ` · <b>مذاکره تا ${money(it.offer)}</b>` : "") + `</div>` +
+      `<div style="display:flex;gap:8px">` +
+        `<button class="btn gh sm" data-id="${esc(it.id)}">جزئیات</button>` +
+        `<button class="xbtn" data-dismiss="${esc(it.id)}" title="دیده شد">${XMARK}</button>` +
+      `</div>` +
+    `</div>`;
+
+  return `<article class="card ${cls}${it.bookmarked ? " marked" : ""}${it.dismissed ? " gone" : ""}">` +
+    `<div class="c-star"><button class="star${it.bookmarked ? " on" : ""}" data-bm="${esc(it.id)}" title="بوکمارک">${STAR}</button></div>` +
+    head + body + foot + `</article>`;
+}
+
+function renderDeals(items){
+  if (!items.length){
+    $("list").innerHTML =
+      '<div class="empty">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>' +
+      '<h3>فعلاً فرصت سودداری نیست</h3>' +
+      '<p>' + esc(S.hint || "معیارها را باز کنید یا «دریافت» بزنید.") + '</p></div>';
+    return;
+  }
+  $("list").innerHTML = items.map(it => cardHtml(it, true)).join("");
+  bindCards();
+}
+function bindCards(){
+  $("list").querySelectorAll("[data-id]").forEach(b => b.onclick = () => detail(b.dataset.id));
+  $("list").querySelectorAll("[data-bm]").forEach(b =>
+    b.onclick = () => toggleBookmark(b.dataset.bm, !b.classList.contains("on")));
+  $("list").querySelectorAll("[data-dismiss]").forEach(b =>
+    b.onclick = () => toggleDismiss(b.dataset.dismiss, true));
+}
+
+function render(items){
+  if (S.view === "deals") return renderDeals(items);
+  if (!items.length){
+    $("list").innerHTML =
+      '<div class="empty">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>' +
+      '<h3>' + (S.view === "bookmarks" ? "لیست بوکمارک خالی است" : "موردی پیدا نشد") + '</h3>' +
+      '<p>' + (S.view === "bookmarks"
+        ? "با زدن ستاره روی هر آگهی، اینجا نگهش می‌دارید."
+        : "فیلترها را بازتر کنید یا دکمهٔ «دریافت» را بزنید.") + '</p></div>';
+    return;
+  }
+  $("list").innerHTML = items.map(it => cardHtml(it, true)).join("");
+  bindCards();
+}
+async function toggleBookmark(id, value){  const r = await fetch("/api/bookmark", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, value }),
+  });
+  const d = await r.json();
+  if (d.error) return;
+  $("bmCount").textContent = fa(d.count ?? 0);
+  const card = $(`[data-bm="${CSS.escape(id)}"]`)?.closest(".card");
+  if (card){
+    card.classList.toggle("marked", value);
+    const star = card.querySelector("[data-bm]");
+    if (star) star.classList.toggle("on", value);
+  }
+  if (S.view === "bookmarks" && !value) load();
+}
+
+async function toggleDismiss(id, value){
+  await fetch("/api/dismiss", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, value }),
+  });
+  const card = $(`[data-dismiss="${CSS.escape(id)}"]`)?.closest(".card");
+  if (card) card.classList.add("gone");
+  setTimeout(() => { if (S.view === "bookmarks") load(); }, 350);
+}
+
+/* Server strings come back with latin digits; the UI is fully Persian. */
+const pv = s => fa(String(s ?? "").replace(/,/g, ","));
+
+function detail(id){
+  fetch("/api/listing/" + encodeURIComponent(id)).then(r => r.json()).then(it => {
+    $("mTitle").textContent = it.title || "جزئیات";
+    $("mLink").href = it.url || "#";
+    const age = ageInfo(it.published_at);
+    const D = it.deal || {};
+    const dash = "—";
+
+    const group = (title, rows) =>
+      `<div class="dgroup"><h4>${esc(title)}</h4>` +
+      rows.map(([k, v]) =>
+        `<div class="drow"><span>${esc(k)}</span><b>${esc(fa(String(v)))}</b></div>`).join("") +
+      `</div>`;
+
+    const money2 = n => (n == null ? dash : money(n));
+    const groups = [
+      group("معامله", [
+        ["قیمت آگهی", money2(it.price)],
+        ["قیمت واقعی فروش", money2(D.resale)],
+        ["سود", D.profit == null ? dash : money(D.profit) +
+          (D.roi ? ` (${fa(Math.round(D.roi * 100))}٪)` : "")],
+        ["میانهٔ بازار", money2(it.baseline)],
+        ["پیشنهاد مذاکره", it.offer ? money(it.offer) : dash],
+      ]),
+      group("وضعیت", [
+        ["بدنه", it.body_condition || dash],
+        ["شاسی", it.chassis || dash],
+        ["موتور", it.engine || dash],
+        ["گیربکس", [it.gearbox_state, it.gearbox].filter(Boolean).join(" · ") || dash],
+      ]),
+      group("مشخصات", [
+        ["مدل", pv(it.trim || it.label) || dash],
+        ["سال", it.year ? fa(it.year) : dash],
+        ["کارکرد", it.mileage ? km(it.mileage) : dash],
+        ["رنگ", it.paint || dash],
+        ["سوخت", it.fuel || dash],
+        ["بیمه", pv(it.insurance) || dash],
+      ]),
+      group("آگهی", [
+        ["محل", [it.district, it.city].filter(Boolean).join("، ") || dash],
+        ["زمان", age.text],
+        ["فروشنده", it.business ? "مغازه‌ای" : "شخصی"],
+        ["افت بابت ایراد", D.factor ? fa(Math.round((1 - D.factor) * 100)) + "٪" : dash],
+      ]),
+    ].join("");
+
+    $("mBody").innerHTML = groups;
+    $("mask").classList.add("on");
+  }).catch(() => { $("mTitle").textContent = "خطا"; });
+}
+async function toggleBookmark(id, value){  const r = await fetch("/api/bookmark", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, value }),
+  });
+  const d = await r.json();
+  if (d.error) return;
+  $("bmCount").textContent = fa(d.count ?? 0);
+  const card = $(`[data-bm="${CSS.escape(id)}"]`)?.closest(".card");
+  if (card){
+    card.classList.toggle("marked", value);
+    const star = card.querySelector("[data-bm]");
+    if (star) star.classList.toggle("on", value);
+  }
+  if (S.view === "bookmarks" && !value) load();
+}
+
+async function toggleDismiss(id, value){
+  await fetch("/api/dismiss", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, value }),
+  });
+  const card = $(`[data-dismiss="${CSS.escape(id)}"]`)?.closest(".card");
+  if (card) card.classList.add("gone");
+  setTimeout(() => { if (S.view === "bookmarks") load(); }, 350);
+}
+
+function renderMarket(m){
+  S.market = m;
+  const cards = [['کل بازار', mT(m.overall.median), ""]];
+  const own = new Set();
+  Object.entries(m.vehicles || {}).forEach(([path, v]) => {
+    if (own.has(path) || cards.length > 12) return;
+    own.add(path);
+    cards.push([v.label, mT(v.stats.median) + " · " + fa(v.stats.count), path]);
+  });
+  $("strip").innerHTML = cards.map(([k, v, p]) =>
+    `<button class="mchip" data-p="${esc(p || "")}"><b>${esc(v)}</b><span>${esc(k)}</span></button>`).join("");
+  $("strip").querySelectorAll(".mchip").forEach(el => el.onclick = () => {
+    const p = el.dataset.p;
+    S.path = p || "";
+    document.querySelectorAll("#viewSeg button").forEach(x =>
+      x.classList.toggle("on", x.dataset.view === "all"));
+    S.view = "all";
+    renderMarket(S.market);
+    load();
+  });
+  $("kMedian").textContent = mT(m.overall.median);
+}
+
+function setProgress(f){
+  const box = $("prog");
+  if (!f.running && f.phase === "idle"){ box.classList.remove("on"); return; }
+  box.classList.add("on");
+  box.classList.toggle("err", !!f.error);
+  $("progTitle").textContent = f.running
+    ? ("در حال دریافت… " + (f.phase || ""))
+    : (f.error ? "خطا: " + f.error : "پایان — " + (f.phase || ""));
+  $("progLog").innerHTML = (f.log || []).map(l => "<div>" + esc(l) + "</div>").join("");
+  $("progLog").scrollTop = 999999;
+  $("fetchBtn").disabled = f.running;
+  if (!f.running && S.fetching){
+    S.fetching = false;
+    stats();
+    load();
+    setTimeout(() => { if (!f.error) $("prog").classList.remove("on"); }, 6000);
+  }
+}
+
+async function poll(){
+  try{ setProgress(await (await fetch("/api/fetch/status")).json()); }catch(e){}
+}
+
+async function stats(){
+  const [m, s] = await Promise.all([
+    (await fetch("/api/market")).json(),
+    (await fetch("/api/stats")).json(),
+  ]);
+  renderMarket(m);
+  $("kTotal").textContent = n0(s.total);
+  $("bmCount").textContent = fa(s.bookmarked ?? 0);
+}
+
+/* ---------------- side drawer ---------------- */
+const openSide = () => { $("side").classList.add("open"); $("scrim").classList.add("on"); };
+const closeSide = () => { $("side").classList.remove("open"); $("scrim").classList.remove("on"); };
+const closeModal = () => $("mask").classList.remove("on");
+
+/* ---------------- init ---------------- */
+async function init(){
+  const b = await (await fetch("/api/bootstrap")).json();
+  const c = b.config.search;
+  const targets = (b.config.targets || []).filter(t => t.enabled);
+  $("brandSub").textContent = c.city + " · " + (targets.map(t => t.label).join("، ") || "همهٔ خودروها");
+  $("headSub").textContent = c.city + " · " + (targets.map(t => t.label).join("، ") || "همهٔ خودروها");
+  $("webLink").innerHTML = b.web_url
+    ? 'صفحهٔ وب: <a href="' + esc(b.web_url) + '" target="_blank" rel="noopener">دیوار</a>'
+    : "";
+  renderMarket(b.market);
+  $("kTotal").textContent = n0(b.stats.total);
+  $("kMedian").textContent = mT(b.market.overall.median);
+  $("bmCount").textContent = fa(b.stats.bookmarked ?? 0);
+  setProgress(b.fetch);
+  load();
+
+  let t;
+  ["q","minYear","maxYear","maxKm","maxPrice"].forEach(id =>
+    $(id).addEventListener("input", () => { clearTimeout(t); t = setTimeout(load, 340); }));
+  ["dClean","dChassis","dKnown","dBusiness","dSalvage","hideDismissed"].forEach(id =>
+    $(id).addEventListener("change", load));
+  ["dProfit","dAge"].forEach(id => {
+    $(id).addEventListener("input", () => {
+      $(id).dataset.touched = "1";
+      clearTimeout(t); t = setTimeout(load, 340);
+    });
+  });
+  $("sort").addEventListener("change", load);
+
+  document.querySelectorAll("#viewSeg button").forEach(b => b.onclick = () => {
+    S.view = b.dataset.view;
+    document.querySelectorAll("#viewSeg button").forEach(x => x.classList.toggle("on", x === b));
+    load();
+  });
+
+  $("fetchBtn").onclick = async () => {
+    S.fetching = true;
+    $("prog").classList.add("on");
+    await fetch("/api/fetch", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pages: c.pages || 3 }),
+    });
+    poll();
+  };
+  $("burger").onclick = openSide;
+  $("sideClose").onclick = closeSide;
+  $("scrim").onclick = closeSide;
+  $("mClose").onclick = $("mClose2").onclick = closeModal;
+  $("mask").onclick = e => { if (e.target === $("mask")) closeModal(); };
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape"){ closeModal(); closeSide(); }
+  });
+  $("resetBtn").onclick = () => {
+    ["q","minYear","maxYear","maxKm","maxPrice","dProfit","dAge"]
+      .forEach(id => { $(id).value = ""; delete $(id).dataset.touched; });
+    ["dClean","dChassis","dKnown","dBusiness","dSalvage"]
+      .forEach(id => delete $(id).dataset.touched);
+    $("hideDismissed").checked = true;
+    $("sort").value = "flip";
+    S.path = "";
+    S.view = "deals";
+    document.querySelectorAll("#viewSeg button").forEach(x =>
+      x.classList.toggle("on", x.dataset.view === "deals"));
+    renderMarket(S.market); load(); closeSide();
+  };
+
+  setInterval(poll, 1200);
+}
+init();
+</script>
+</body>
+</html>
